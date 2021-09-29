@@ -1,0 +1,20 @@
+.centered {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-flow: column wrap;
+}
+
+app-button {
+  margin-bottom: 1rem;
+}
+
+app-smart-spinner {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+}

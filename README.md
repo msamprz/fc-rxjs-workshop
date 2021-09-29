@@ -1,27 +1,19 @@
 # NgRxjsWorkshop
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.7.
+A base RxJS repo with a challenge to let people demonstrate their RxJS reactive-thinking skills.
 
-## Development server
+### Challenge
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Your imaginary PM complains that users can't tell when the app is processing their information.
 
-## Code scaffolding
+They have asked you to show a loading spinner any time there is any task running in the app.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+### Technical info
 
-## Build
+- You have decided to use a spinner library to save yourself the presentational logic and template. This library provides a service `SpinnerService` to interact with the spinner.
+- You can use the `show(): void` and `hide(): void` methods of the `SpinnerService` to show/hide the spinner onto the page respectively.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+### Important
+- Please note that the `BackgroundTaskCounterService`, as well as the `Background tasks: {{ backgroundTaskCounterService.taskCount }}` text in the `app.component.ts` are merely meant for your ease of debugging. You need to solve this challenge as if that flow does not exist. This is why the `BackgroundTaskCounterService` is hidden away behind the `app-button` presentation component.
+- Therefore, you will mainly be working on the `TaskService`/`task.service.ts` file.
