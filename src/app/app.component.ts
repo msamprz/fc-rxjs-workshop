@@ -47,20 +47,29 @@ export class AppComponent implements OnInit, OnDestroy {
     * When does the loader need to hide?
     *   When the counter is at 0 -> no tasks are left
     * */
-    const shouldHideSpinner = this.taskService.currentLoadCount.pipe(
+    const spinnerDeactivated = this.taskService.currentLoadCount.pipe(
         filter(count => count === 0)
     );
     /*
     * When does the loader need to show?
     *   When the counter goes from 0 to 1 -> tasks have started
     * */
-    const shouldShowSpinner = this.taskService.currentLoadCount.pipe(
+    const spinnerActivated = this.taskService.currentLoadCount.pipe(
         pairwise(),
         filter(([prevCount, currentCount]: [number, number]) => prevCount === 0 && currentCount === 1)
     );
 
+    /*
+    * The moment the spinner becomes active...
+    *   Switch to waiting for 2s before showing it
+    *   But cancel if it becomes deactivated in the meantime
+    * */
+    const shouldShowSpinner = spinnerActivated.pipe(
+        switchMap(() => timer(2000).pipe(takeUntil(spinnerDeactivated)))
+    );
+
     const spinnerState = shouldShowSpinner.pipe(
-        switchMap(() => this.showSpinner.pipe(takeUntil(shouldHideSpinner)))
+        switchMap(() => this.showSpinner.pipe(takeUntil(spinnerDeactivated)))
     ).subscribe();
 
     this.subscriptions.push(spinnerState);
