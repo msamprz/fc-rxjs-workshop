@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { timer } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { filter, pairwise, tap } from 'rxjs/operators';
 import { BackgroundTaskCounterService } from './background-task-counter.service';
 import { TaskService } from './task.service';
 
@@ -23,8 +23,26 @@ import { TaskService } from './task.service';
   `,
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   constructor(public backgroundTaskCounterService: BackgroundTaskCounterService, private taskService: TaskService) {}
+
+  ngOnInit() {
+    /*
+    * When does the loader need to hide?
+    *   When the counter is at 0 -> no tasks are left
+    * */
+    const shouldHideSpinner = this.taskService.currentLoadCount.pipe(
+        filter(count => count === 0)
+    );
+    /*
+    * When does the loader need to show?
+    *   When the counter goes from 0 to 1 -> tasks have started
+    * */
+    const shouldShowSpinner = this.taskService.currentLoadCount.pipe(
+        pairwise(),
+        filter(([prevCount, currentCount]: [number, number]) => prevCount === 0 && currentCount === 1)
+    );
+  }
 
   public triggerTask(time: number) {
     return () => {

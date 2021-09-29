@@ -29,7 +29,7 @@ export class TaskService {
 
   private allLoadTypes = merge(this.loadDown, this.loadUp);
 
-  private currentLoadCount = this.allLoadTypes.pipe(
+  public currentLoadCount = this.allLoadTypes.pipe(
     startWith(0),
     scan((totalCurrentLoads, changeInLoads) => {
       const newLoadCount = totalCurrentLoads + changeInLoads;
