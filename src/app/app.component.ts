@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { timer } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { BackgroundTaskCounterService } from './background-task-counter.service';
+import { TaskService } from './task.service';
 
 @Component({
   selector: 'app-root',
@@ -22,9 +24,12 @@ import { BackgroundTaskCounterService } from './background-task-counter.service'
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  constructor(public backgroundTaskCounterService: BackgroundTaskCounterService) {}
+  constructor(public backgroundTaskCounterService: BackgroundTaskCounterService, private taskService: TaskService) {}
 
   public triggerTask(time: number) {
-    return () => timer(time);
+    return () => {
+      this.taskService.startTask();
+      return timer(time).pipe(tap(() => this.taskService.endTask()));
+    };
   }
 }

@@ -1,6 +1,13 @@
 import { Injectable } from '@angular/core';
-import { merge, Observable } from 'rxjs';
+import { merge, Observable, Subject } from 'rxjs';
 import { distinctUntilChanged, mapTo, scan, shareReplay, startWith } from 'rxjs/operators';
+
+/*
+* Sources of task initiation and completion:
+*   timer(6000).subscribe(...)
+*   setTimeout(() => {...}, 6000)
+*   fetch('someapi.com', (...) => {...})
+* */
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +20,8 @@ export class TaskService {
   *   When an async task ends, decrease the count by 1
   * */
 
-  private taskStarts = new Observable();
-  private taskCompletes = new Observable();
+  private taskStarts = new Subject();
+  private taskCompletes = new Subject();
   private showSpinner = new Observable();
 
   private loadUp = this.taskStarts.pipe(mapTo(1));
@@ -34,6 +41,14 @@ export class TaskService {
   );
 
   constructor() { }
+
+  public startTask() {
+    this.taskStarts.next();
+  }
+
+  public endTask() {
+    this.taskCompletes.next();
+  }
 }
 
 // https://stackblitz.com/edit/rxjs-6uyaid?file=index.ts
