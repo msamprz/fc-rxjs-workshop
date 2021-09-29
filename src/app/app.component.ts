@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription, timer } from 'rxjs';
 import { filter, pairwise, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { BackgroundTaskCounterService } from './background-task-counter.service';
+import { SpinnerService } from './spinner.service';
 import { TaskService } from './task.service';
 
 @Component({
@@ -25,9 +26,21 @@ import { TaskService } from './task.service';
 })
 export class AppComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
-  private showSpinner = new Observable();
+  private showSpinner = new Observable<any>(() => {
+    // I've been subscribed to!
+    this.spinnerService.show()
 
-  constructor(public backgroundTaskCounterService: BackgroundTaskCounterService, private taskService: TaskService) {}
+    return () => {
+      // I've been unsubscribed from
+      this.spinnerService.hide();
+    };
+  });
+
+  constructor(
+      public backgroundTaskCounterService: BackgroundTaskCounterService,
+      private taskService: TaskService,
+      private spinnerService: SpinnerService
+  ) {}
 
   ngOnInit() {
     /*
