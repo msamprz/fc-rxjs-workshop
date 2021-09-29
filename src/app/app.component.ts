@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subscription, timer } from 'rxjs';
+import { combineLatest, Observable, Subscription, timer } from 'rxjs';
 import { filter, pairwise, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { BackgroundTaskCounterService } from './background-task-counter.service';
 import { SpinnerService } from './spinner.service';
@@ -59,17 +59,30 @@ export class AppComponent implements OnInit, OnDestroy {
         filter(([prevCount, currentCount]: [number, number]) => prevCount === 0 && currentCount === 1)
     );
 
+    const flashThreshold = 2000;
+
     /*
     * The moment the spinner becomes active...
     *   Switch to waiting for 2s before showing it
     *   But cancel if it becomes deactivated in the meantime
     * */
     const shouldShowSpinner = spinnerActivated.pipe(
-        switchMap(() => timer(2000).pipe(takeUntil(spinnerDeactivated)))
+        switchMap(() => timer(flashThreshold).pipe(takeUntil(spinnerDeactivated)))
     );
 
+    /*
+    * When does the loader need to hide?
+    *   When 2 events have taken place:
+    *     Spinner has been deactivated
+    *     2 seconds have passed
+    * */
+    const shouldHideSpinner = combineLatest([
+        spinnerDeactivated,
+        timer(flashThreshold)
+    ]);
+
     const spinnerState = shouldShowSpinner.pipe(
-        switchMap(() => this.showSpinner.pipe(takeUntil(spinnerDeactivated)))
+        switchMap(() => this.showSpinner.pipe(takeUntil(shouldHideSpinner)))
     ).subscribe();
 
     this.subscriptions.push(spinnerState);
