@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { merge, Observable } from 'rxjs';
-import { distinctUntilChanged, mapTo, scan, startWith } from 'rxjs/operators';
+import { distinctUntilChanged, mapTo, scan, shareReplay, startWith } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -29,8 +29,11 @@ export class TaskService {
 
       return newLoadCount < 0 ? 0 : newLoadCount;
     }),
-    distinctUntilChanged()
+    distinctUntilChanged(),
+    shareReplay({ bufferSize: 1, refCount: true })
   );
 
   constructor() { }
 }
+
+// https://stackblitz.com/edit/rxjs-6uyaid?file=index.ts
