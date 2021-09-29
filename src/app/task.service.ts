@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { merge, Observable } from 'rxjs';
-import { mapTo, scan } from 'rxjs/operators';
+import { distinctUntilChanged, mapTo, scan, startWith } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -23,8 +23,14 @@ export class TaskService {
   private allLoadTypes = merge(this.loadDown, this.loadUp);
 
   private currentLoadCount = this.allLoadTypes.pipe(
-      scan((totalCurrentLoads, changeInLoads) => totalCurrentLoads + changeInLoads, 0)
-  )
+    startWith(0),
+    scan((totalCurrentLoads, changeInLoads) => {
+      const newLoadCount = totalCurrentLoads + changeInLoads;
+
+      return newLoadCount < 0 ? 0 : newLoadCount;
+    }),
+    distinctUntilChanged()
+  );
 
   constructor() { }
 }
