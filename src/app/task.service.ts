@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { merge, Observable, Subject } from 'rxjs';
+import { merge, Subject } from 'rxjs';
 import { distinctUntilChanged, mapTo, scan, shareReplay, startWith } from 'rxjs/operators';
 
 /*
@@ -22,7 +22,6 @@ export class TaskService {
 
   private taskStarts = new Subject();
   private taskCompletes = new Subject();
-  private showSpinner = new Observable();
 
   private loadUp = this.taskStarts.pipe(mapTo(1));
   private loadDown = this.taskCompletes.pipe(mapTo(-1));

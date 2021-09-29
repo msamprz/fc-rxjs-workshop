@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { timer } from 'rxjs';
-import { filter, pairwise, tap } from 'rxjs/operators';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Observable, Subscription, timer } from 'rxjs';
+import { filter, pairwise, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { BackgroundTaskCounterService } from './background-task-counter.service';
 import { TaskService } from './task.service';
 
@@ -23,7 +23,10 @@ import { TaskService } from './task.service';
   `,
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
+  private subscriptions: Subscription[] = [];
+  private showSpinner = new Observable();
+
   constructor(public backgroundTaskCounterService: BackgroundTaskCounterService, private taskService: TaskService) {}
 
   ngOnInit() {
@@ -42,6 +45,16 @@ export class AppComponent implements OnInit {
         pairwise(),
         filter(([prevCount, currentCount]: [number, number]) => prevCount === 0 && currentCount === 1)
     );
+
+    const spinnerState = shouldShowSpinner.pipe(
+        switchMap(() => this.showSpinner.pipe(takeUntil(shouldHideSpinner)))
+    ).subscribe();
+
+    this.subscriptions.push(spinnerState);
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
   public triggerTask(time: number) {
